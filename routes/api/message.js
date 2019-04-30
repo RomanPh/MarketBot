@@ -6,7 +6,9 @@ const messageController = require('./../../controllers/messageController');
 
 router.group('/', (router) => {
     router.get('/webhook', messageController.verify);
-    router.get('/setup', messageController.setupGreetingText);
+    router.post('/webhook', messageController.webhookHandler);
+    router.get('/setup', messageController.setup);
+    
 });
 
 module.exports = router;
