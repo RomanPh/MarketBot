@@ -5,7 +5,7 @@ const request = require('request');
 
 function sendAPIGraphRequest(messageData, logLabel='unknown') {
     console.log('messageData=', messageData);
-    console.log('0002=', `https://graph.facebook.com/v3.2/${config.app.USER_ID}/messenger_profile?access_token=` + config.app.APP_ACCESS_TOKEN);
+    console.log('sendAPIGraphRequest=', `https://graph.facebook.com/v3.2/${config.app.USER_ID}/messenger_profile?access_token=` + config.app.APP_ACCESS_TOKEN);
     request({
         url: `https://graph.facebook.com/v3.2/${config.app.USER_ID}/messenger_profile?access_token=` + config.app.APP_ACCESS_TOKEN,
         method: 'POST',
@@ -36,7 +36,7 @@ function sendApiGraphMessage(messageData) {
             let messageId = body.message_id;
         } else {
             console.error("Unable to send message.");
-            console.error(response);
+            //console.error(response);
             console.error(error);
         }
     });  
