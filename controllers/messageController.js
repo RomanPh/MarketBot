@@ -7,6 +7,7 @@ const MessageManager = require('./../manager/messageManager');
 let messageManager = new MessageManager();
 
     function verify(req, res) {
+        console.log('11111111111111111111=');
         let mode = req.query['hub.mode'];
         let token = req.query['hub.verify_token'];
         let challenge = req.query['hub.challenge'];

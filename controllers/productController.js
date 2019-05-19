@@ -32,7 +32,7 @@ class ProductController {
 
     async getProductsCaroselByCategory(recipientId, data) {
         console.log('data=', data);
-        let productCarosel = await this.productManager.getProductsCarosel(data.id);
+        let productCarosel = await this.productManager.getProductsCarosel(recipientId, data.id);
         let messageData = {
                             recipient: {
                                 id: recipientId

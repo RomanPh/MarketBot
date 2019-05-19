@@ -8,6 +8,14 @@ class ProductManager {
         this.products = [];
     }
 
+    getEmptyMessage({id, name}) {
+        return [{
+			"title":"Nothing to show!",
+            "subtitle": "Nothing to show!",
+            "buttons": []
+		}];
+    }
+
     rawCategoryToCarouselItem({id, name}, buttonTitle, type) {
 
         console.log('type===', type)
@@ -62,7 +70,7 @@ class ProductManager {
         }
     }
 
-    rawProductsToCarousel(data) {
+    rawProductsToCarousel(recipientId, data) {
         if (data && Array.isArray(data.products) && data.products.length > 0) {
             //this.categories = data.categories;
             return data.products.map( product => {
@@ -72,6 +80,9 @@ class ProductManager {
                     //console.log('item category=', this.rawCategoryToCarouselItem(category))
                     return this.rawProductToCarouselItem(product, "Get product", "get_product");
                 });
+        } else {
+            console.log('rawProductsToCarousel=>recipientId=', recipientId)
+            return this.getEmptyMessage(recipientId);
         }
     }
 
@@ -126,11 +137,11 @@ class ProductManager {
         };
     };
 
-    async getProductsCarosel(categoryId='unknown') {
+    async getProductsCarosel(recipientId, categoryId='unknown') {
         console.log('getProductsCarosel::categoryId=', categoryId);
         let rawProductsDataByCategoryId = await productsApi.getProductsList(categoryId);
         console.log('getProductsCarosel::rawProductsDataByCategoryId=', rawProductsDataByCategoryId.products.length);
-        let categories = this.rawProductsToCarousel(rawProductsDataByCategoryId);
+        let categories = this.rawProductsToCarousel(recipientId, rawProductsDataByCategoryId);
         console.log('categories.lenght=', categories.length);
         //console.log('categories.lenght=', categories);
         return {
