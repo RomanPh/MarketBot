@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const express = require('express');
 const bodyParser = require('body-parser');
 const request = require('request');
@@ -13,6 +14,9 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(routes);
 
-app.listen(app.get('port'), function() {
-    console.log('server running at : ', app.get('port'))
+mongoose.connect("mongodb://localhost:27017/usersproducts", { useNewUrlParser: true }, function(err){
+    if(err) return console.log(err);
+    app.listen(app.get('port'), function() {
+        console.log('server running at : ', app.get('port'))
+    });
 });

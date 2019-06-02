@@ -8,7 +8,7 @@ class MessageManager {
 		this.productController = new ProductController();
 	}
 
-	handleReceivePostback (event) {
+	handleReceivePostback(event) {
 		//console.log('handleReceivePostback= ', event);
 		const {type, data} = JSON.parse(event.postback.payload);
 		console.log('payload= ', event.postback.payload);
@@ -40,17 +40,17 @@ class MessageManager {
 		} else if (type.substring(0, 11) === 'get_started') {
 			console.log('get_started ');
 			requestHelper.sendApiGraphMessage(messageData);
+		} else if (type.substring(0, 11) === 'get_product') {
+			console.log('get_product ');
+			this.productController.addToCart(senderId, data);
+		} else if (type.substring(0, 11) === 'get_history') {
+			console.log('get_history ');
+			this.productController.getPurchaseHistory(senderId, data);
 		} else {
 			console.error(`Unknown Postback called: ${type}`);
 		}
 	};
 
-	/*
-	* handleReceiveMessage - Message Event called when a message is sent to
-	* your page. The 'message' object format can vary depending on the kind
-	* of message that was received. Read more at: https://developers.facebook.com/
-	* docs/messenger-platform/webhook-reference/message-received
-	*/
 	handleReceiveMessage (event) {
 		const message = event.message;
 		const senderId = event.sender.id;

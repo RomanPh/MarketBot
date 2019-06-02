@@ -35,7 +35,8 @@ function sendApiGraphMessage(messageData) {
             let recipientId = body.recipient_id;
             let messageId = body.message_id;
         } else {
-            console.error("Unable to send message.");
+            console.error("Unable to send message=", error);
+            console.error("response.statusCode=", response.statusCode);
             //console.error(response);
             console.error(error);
         }

@@ -1,23 +1,27 @@
 'use strict';
 
 const productsApi = require('../helper/productsApi');
+const DBManager = require('./dbManager.js');
 
 class ProductManager {
     constructor() {
         this.categories = [];
         this.products = [];
+        this.dbManager = new DBManager();
     }
 
-    getEmptyMessage({id, name}) {
+    getMessage(data) {
+        let {id, name, message} = data;
+        console.log('data=', data)
+        console.log('getMessage====', message)
         return [{
-			"title":"Nothing to show!",
-            "subtitle": "Nothing to show!",
+			"title": message,
+            "subtitle": ' ',
             "buttons": []
 		}];
     }
 
     rawCategoryToCarouselItem({id, name}, buttonTitle, type) {
-
         console.log('type===', type)
         return {
             "title": name,
@@ -38,22 +42,30 @@ class ProductManager {
     };
 
     rawProductToCarouselItem({sku, name, longDescription, image}, buttonTitle, type) {
-        return {
-            "title": name,
-            "image_url": image,
-            "subtitle": longDescription,
-            "buttons": [
+        console.log('rawProductToCarouselItem=image= ', image)
+        let buttons = [];
+        if (buttonTitle && type) {
+            buttons = [
                 {
                     "type":"postback",
                     "title": buttonTitle,
                     "payload": JSON.stringify({
                         type: type,
                         data: {
-                            id: sku,
+                            sku: sku,
+                            name: name,
+                            longDescription: longDescription,
+                            image: image
                         },
                     }),
                 } 
-            ],
+            ]
+        };
+        return {
+            "title": name,
+            "image_url": image,
+            "subtitle": longDescription,
+            "buttons": buttons,
         };
     };
 
@@ -76,13 +88,13 @@ class ProductManager {
             return data.products.map( product => {
                     //console.log('rawCategoriesToCarousel::category=', category)
                     this.products.push(product);
-                    console.log('rawCategoriesToCarousel::category.length=',  this.products.length)
+                    console.log('rawProductsToCarousel::category.length=',  this.products.length)
                     //console.log('item category=', this.rawCategoryToCarouselItem(category))
                     return this.rawProductToCarouselItem(product, "Get product", "get_product");
                 });
         } else {
             console.log('rawProductsToCarousel=>recipientId=', recipientId)
-            return this.getEmptyMessage(recipientId);
+            return this.getMessage({recipientId, message: "Nothing to show" });
         }
     }
 
@@ -101,7 +113,7 @@ class ProductManager {
                 return this.rawCategoryToCarouselItem(pathItem, "Get products", "get_products");
             });
         } else {
-            console.log('-----------------')
+            console.log('Selected category doesn\'t contain subcategories');
             return [];
         }    
     }
@@ -124,7 +136,7 @@ class ProductManager {
     async getSubCategoriesCarosel(categoryId='unknown') {
         console.log('getSubCategoriessCarosel::categoryId=', categoryId);
         let categories = this.rawSubCategoriesToCarousel(categoryId);
-        console.log('categories.lenght=', categories.length);
+        console.log('categories.lenght=', categories);
         //console.log('categories.lenght=', categories);
         return {
             attachment: {
@@ -141,19 +153,75 @@ class ProductManager {
         console.log('getProductsCarosel::categoryId=', categoryId);
         let rawProductsDataByCategoryId = await productsApi.getProductsList(categoryId);
         console.log('getProductsCarosel::rawProductsDataByCategoryId=', rawProductsDataByCategoryId.products.length);
-        let categories = this.rawProductsToCarousel(recipientId, rawProductsDataByCategoryId);
-        console.log('categories.lenght=', categories.length);
+        let products = this.rawProductsToCarousel(recipientId, rawProductsDataByCategoryId);
+        console.log('categories.lenght=', products);
         //console.log('categories.lenght=', categories);
         return {
             attachment: {
                 type: 'template',
                 payload: {
                     template_type: 'generic',
-                    elements: categories,
+                    elements: products,
                 },
             },
         };
     };
+
+    async addToCart(recipientId, data) {
+        console.log('addToCart::recipientId=', recipientId);
+        console.log('addToCart::data=', data);
+        let savedProductMessage;
+        try {
+            await this.dbManager.save(recipientId, data);
+            savedProductMessage = 'Product successful added to cart';
+        } catch (err) {
+            console.log('Saving error=', err);
+            savedProductMessage = 'Product saving error to cart';
+        }
+        console.log('addToCart::savedProductMessage=', savedProductMessage);
+        let resultAdding = this.getMessage({id: recipientId, message: savedProductMessage });
+        console.log('resultAdding=', resultAdding)
+        return {
+            attachment: {
+                type: 'template',
+                payload: {
+                    template_type: 'generic',
+                    elements: resultAdding,
+                },
+            },
+        };
+    }
+
+    async getPurchaseHistory(recipientId, data) {
+        let purchaseHistory;
+        let purchaseHistoryCarusel = [];
+        try {
+            purchaseHistory = await this.dbManager.find(recipientId);
+        } catch(err) {
+            console.error('getPurchaseHistory::error=', err);
+            purchaseHistory = []
+        }
+        
+        purchaseHistory = purchaseHistory.length && purchaseHistory[0]; 
+        console.log('getPurchaseHistory::purchaseHistory=', purchaseHistory.products.l);
+        purchaseHistory.products.forEach( item => {
+            console.log('purchaseHistory::item=', item);
+                console.log('getPurchaseHistory::itemProduct.product=', item.product)
+                purchaseHistoryCarusel.push(this.rawProductToCarouselItem(item.product));            
+        });
+         
+        if (!purchaseHistoryCarusel.length) purchaseHistoryCarusel = this.getMessage({id: recipientId, message: "History is empty" });
+        console.log('getPurchaseHistory::purchaseHistoryCarusel=', purchaseHistoryCarusel);
+        return {
+            attachment: {
+                type: 'template',
+                payload: {
+                    template_type: 'generic',
+                    elements: purchaseHistoryCarusel,
+                },
+            },
+        };
+    }
 }
 
 

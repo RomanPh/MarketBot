@@ -70,7 +70,15 @@ let messageManager = new MessageManager();
                             type: 'get_categories',
                             data: { },
                         }),
-                    }
+                    },
+                    {
+                        "title":"History",
+                        "type":"postback",
+                        "payload": JSON.stringify({
+                            type: 'get_history',
+                            data: { },
+                        }),
+                    },
                 ]}
             ]};  
         requestHelper.sendAPIGraphRequest(messageData, 'Setup persistent menu');
