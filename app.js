@@ -14,7 +14,8 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(routes);
 
-mongoose.connect("mongodb://localhost:27017/usersproducts", { useNewUrlParser: true }, function(err){
+mongoose.connect(config.db.host, { user: config.db.login,
+    pass: config.db.pass, useNewUrlParser: true }, function(err){
     if(err) return console.log(err);
     app.listen(app.get('port'), function() {
         console.log('server running at : ', app.get('port'))

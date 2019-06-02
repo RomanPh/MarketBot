@@ -9,9 +9,10 @@ const config = {
    BestBuy_Api_Key: process.env.BestBuy_API_KEY
  },
  db: {
-   host: 'localhost',
-   port: 27017,
-   name: 'db'
+   host: process.env.db_host,
+   port: process.env.db_port,
+   login: process.env.db_login,
+   pass: process.env.db_pass
  }
 };
 

@@ -12,8 +12,6 @@ class ProductManager {
 
     getMessage(data) {
         let {id, name, message} = data;
-        console.log('data=', data)
-        console.log('getMessage====', message)
         return [{
 			"title": message,
             "subtitle": ' ',
@@ -22,7 +20,6 @@ class ProductManager {
     }
 
     rawCategoryToCarouselItem({id, name}, buttonTitle, type) {
-        console.log('type===', type)
         return {
             "title": name,
             "subtitle": name,
@@ -39,10 +36,9 @@ class ProductManager {
                 } 
             ],
         };
-    };
+    }
 
     rawProductToCarouselItem({sku, name, longDescription, image}, buttonTitle, type) {
-        console.log('rawProductToCarouselItem=image= ', image)
         let buttons = [];
         if (buttonTitle && type) {
             buttons = [
@@ -60,23 +56,19 @@ class ProductManager {
                     }),
                 } 
             ]
-        };
+        }
         return {
             "title": name,
             "image_url": image,
             "subtitle": longDescription,
             "buttons": buttons,
         };
-    };
+    }
 
     rawCategoriesToCarousel(data) {
         if (data && Array.isArray(data.categories) && data.categories.length > 0) {
-            //this.categories = data.categories;
             return data.categories.map( category => {
-                    //console.log('rawCategoriesToCarousel::category=', category)
                     this.categories.push(category);
-                    console.log('rawCategoriesToCarousel::category.length=',  this.categories.length)
-                    //console.log('item category=', this.rawCategoryToCarouselItem(category))
                     return this.rawCategoryToCarouselItem(category, "Get subcategory", "get_subcategories");
                 });
         }
@@ -84,36 +76,25 @@ class ProductManager {
 
     rawProductsToCarousel(recipientId, data) {
         if (data && Array.isArray(data.products) && data.products.length > 0) {
-            //this.categories = data.categories;
             return data.products.map( product => {
-                    //console.log('rawCategoriesToCarousel::category=', category)
                     this.products.push(product);
-                    console.log('rawProductsToCarousel::category.length=',  this.products.length)
-                    //console.log('item category=', this.rawCategoryToCarouselItem(category))
                     return this.rawProductToCarouselItem(product, "Get product", "get_product");
                 });
         } else {
-            console.log('rawProductsToCarousel=>recipientId=', recipientId)
             return this.getMessage({recipientId, message: "Nothing to show" });
         }
     }
 
     rawSubCategoriesToCarousel(categoryId) {
-        console.log('categoryId', categoryId)
-        console.log('length', this.categories.length)
         let selectedCategoryArray = this.categories.filter( category => {
-                    //console.log('rawSubCategoriesToCarousel::category=', category.id);
-                    //console.log('rawSubCategoriesToCarousel::category===', category.id == categoryId);
-                    //console.log('item category=', this.rawCategoryToCarouselItem(category))
-                    return category.id == categoryId;
-                })
+                return category.id == categoryId;
+            })
         if (selectedCategoryArray.length > 0 && Array.isArray(selectedCategoryArray[0].path)) {
             return selectedCategoryArray[0].path.map((pathItem) => {
-                //console.log('pathItem', pathItem)
                 return this.rawCategoryToCarouselItem(pathItem, "Get products", "get_products");
             });
         } else {
-            console.log('Selected category doesn\'t contain subcategories');
+            console.error('Selected category doesn\'t contain subcategories');
             return [];
         }    
     }

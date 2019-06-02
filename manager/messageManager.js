@@ -9,12 +9,7 @@ class MessageManager {
 	}
 
 	handleReceivePostback(event) {
-		//console.log('handleReceivePostback= ', event);
 		const {type, data} = JSON.parse(event.postback.payload);
-		console.log('payload= ', event.postback.payload);
-		console.log('data= ', data);
-		console.log('type= ', type);
-		console.log('type.substring(0, 16)= ', type.substring(0, 16));
 		const senderId = event.sender.id;
 		let messageData = {
 						recipient: {
@@ -29,27 +24,21 @@ class MessageManager {
 			messageData.message.text = 'You come back on main page';
 			requestHelper.sendApiGraphMessage(messageData);
 		} else if (type.substring(0, 16) === 'get_categories') {
-			console.log('get_categories ');
 			this.productController.getCategoriesCarosel(senderId);
 		} else if (type.substring(0, 17) === 'get_subcategories') {
-			console.log('get_subcategory ');
 			this.productController.getSubCategoriesCarosel(senderId, data);
 		} else if (type.substring(0, 16) === 'get_products') {
-			console.log('get_products ');
 			this.productController.getProductsCaroselByCategory(senderId, data);
 		} else if (type.substring(0, 11) === 'get_started') {
-			console.log('get_started ');
 			requestHelper.sendApiGraphMessage(messageData);
 		} else if (type.substring(0, 11) === 'get_product') {
-			console.log('get_product ');
 			this.productController.addToCart(senderId, data);
 		} else if (type.substring(0, 11) === 'get_history') {
-			console.log('get_history ');
 			this.productController.getPurchaseHistory(senderId, data);
 		} else {
 			console.error(`Unknown Postback called: ${type}`);
 		}
-	};
+	}
 
 	handleReceiveMessage (event) {
 		const message = event.message;
@@ -66,7 +55,7 @@ class MessageManager {
 		requestHelper.sendAPIGraphRequest(messageData);	
 
 		if (message.text) { requestHelper.sendApiGraphMessage(messageData); }
-	};
+	}
 }
 
 module.exports = MessageManager;
