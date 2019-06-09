@@ -1,7 +1,6 @@
 'use strict';
 
 const config = require('../config');
-const request = require('request');
 const requestHelper = require('./../helper/sender');
 const MessageManager = require('./../manager/messageManager');
 let messageManager = new MessageManager();
