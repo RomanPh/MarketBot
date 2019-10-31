@@ -10,7 +10,7 @@
     "express-group-routes": "^1.1.0",
     "fs": "0.0.1-security",
     "lodash": "^4.17.11",
-    "mongoose": "^5.5.12",
+    "mongoose": "^5.7.5",
     "path": "^0.12.7",
     "request": "^2.88.0",
     "request-promise": "^4.2.4"
